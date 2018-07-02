@@ -6,7 +6,8 @@ public class City extends DataSupport {
     private int id;
     private String cityName;
     private int cityCode;
-    private int privinceId;     //记录当前市所属省的id值
+    private int provinceId;     //记录当前市所属省的id值
+
 
     public int getId() {
         return id;
@@ -32,13 +33,16 @@ public class City extends DataSupport {
         this.cityCode = cityCode;
     }
 
-    public int getPrivinceId() {
-        return privinceId;
+    public int getProvinceId() {
+        return provinceId;
     }
 
-    public void setPrivinceId(int privinceId) {
-        this.privinceId = privinceId;
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
     }
+
+
+
 
 
 }
