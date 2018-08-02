@@ -2,13 +2,15 @@
 <LinearLayout android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fff"
+    android:background="@drawable/timg"
+
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary">
+
+        android:background="#00000000">
 
         <TextView
             android:id="@+id/title_text"

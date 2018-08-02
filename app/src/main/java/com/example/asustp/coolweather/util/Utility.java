@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 public class Utility {
     /**
-     * 解析和处理服务器返回的省级数据
+     * 解析和处理服务器返回的省级数据      将其保存在数据库中
      */
     public static boolean handleProvinceResponse(String response){
         if (!TextUtils.isEmpty(response)) {

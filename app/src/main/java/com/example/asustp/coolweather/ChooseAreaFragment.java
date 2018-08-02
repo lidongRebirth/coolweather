@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.example.asustp.coolweather.db.City;
 import com.example.asustp.coolweather.db.County;
 import com.example.asustp.coolweather.db.Province;
-import com.example.asustp.coolweather.gson.Weather;
 import com.example.asustp.coolweather.util.HttpUtil;
 import com.example.asustp.coolweather.util.Utility;
 
@@ -81,8 +80,12 @@ public class ChooseAreaFragment extends Fragment {
         return view;
     }
 
+    /**
+     * 为ListView和Button设置了点击事件
+     * @param savedInstanceState
+     */
     @Override
-    public void onActivityCreated( Bundle savedInstanceState) {
+    public void onActivityCreated( Bundle savedInstanceState) {//确保和碎片相关联的活动一定已经创建完毕的时候调用
         super.onActivityCreated(savedInstanceState);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -95,6 +98,7 @@ public class ChooseAreaFragment extends Fragment {
                     queryCounties();
                 }else if(currentLevel==LEVEL_COUNTY){
                     String weatherId = countyList.get(position).getWeatherId();
+                    //判断碎片是在MainActivity中还是WeatherActivity中
                     if(getActivity() instanceof MainActivity){
                         Intent intent = new Intent(getActivity(), WeatherActivity.class);
                         intent.putExtra("weather_id", weatherId);
@@ -102,12 +106,13 @@ public class ChooseAreaFragment extends Fragment {
                         getActivity().finish();
                     }else if(getActivity() instanceof WeatherActivity){
                         WeatherActivity activity = (WeatherActivity) getActivity();
-                        activity.drawerLayout.closeDrawers();
+                        activity.drawerLayout.closeDrawers();//关闭滑动菜单
+
                         activity.swipeRefresh.setRefreshing(true);
                         activity.requestWeather(weatherId);
+
+
                     }
-
-
                 }
             }
         });
@@ -126,7 +131,11 @@ public class ChooseAreaFragment extends Fragment {
                 }
             }
         });
-        queryProvinces();//加载省级数据
+
+        /**
+         * 无论如何都会自动加载省级数据，所以在这里面就会给current_level设置值
+         */
+        queryProvinces();//加载省级数据！！！！
     }
     /**
      * 查询全国所有的省，优先从数据库中查询，如果没有查询到再去服务器上查询
@@ -141,7 +150,7 @@ public class ChooseAreaFragment extends Fragment {
                 dataList.add(province.getProvinceName());//将从数据库中查询到的数据添加到List中
             }
             adapter.notifyDataSetChanged();
-            listView.setSelection(0);
+            listView.setSelection(0);   //将第一个数据显示在最上面
             currentLevel=LEVEL_PROVINCE;
         }else {
             String address="http://guolin.tech/api/china";
@@ -195,7 +204,7 @@ public class ChooseAreaFragment extends Fragment {
     }
 
     /**
-     * 根据传入的地址和类型从服务器上查询省市县数据
+     * 根据传入的地址和类型从服务器上查询省市县数据，查询到后先保存在本地数据库，然后在此查询数据，从本地提取出显示在listView中
      */
     private void queryFromServer(String address, final String type){
         showProgressDialog();
@@ -204,14 +213,16 @@ public class ChooseAreaFragment extends Fragment {
             public void onResponse(Call call, Response response) throws IOException {
                 String responseText=response.body().string();
                 boolean result=false;
+
+                //判断返回的数据是哪一种类型的数据，然后按照相应的方法解析
                 if("province".equals(type)){
-                    result = Utility.handleProvinceResponse(responseText);//解析和处理服务器返回的数据
+                    result = Utility.handleProvinceResponse(responseText);//解析和处理服务器返回的数据，该方法会将其存储到数据库中
                 }else if("city".equals(type)){
                     result = Utility.handleCityResponse(responseText, selectedProvince.getId());
                 }else if("county".equals(type)){
                     result = Utility.handleCountyResponse(responseText, selectedCity.getId());
                 }
-                if(result){
+                if(result){//解析数据完成，从数据库中查询并显示在listview中
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -222,6 +233,7 @@ public class ChooseAreaFragment extends Fragment {
                                 queryCities();
                             }else if("county".equals(type)){
                                 queryCounties();
+
                             }
                         }
                     });
